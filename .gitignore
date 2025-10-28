@@ -1,6 +1,9 @@
 # 환경 변수 파일 (보안 정보 포함)
 .env
 
+# 사용자 설정 파일
+urls.txt
+
 # Python 캐시 파일
 __pycache__/
 *.py[cod]
@@ -20,6 +23,7 @@ ENV/
 *.swo
 
 # 생성된 출력 파일
+result/
 wiki_titles.txt
 wiki_by_category.txt
 wiki_by_namespace.txt
