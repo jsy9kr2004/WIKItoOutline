@@ -24,6 +24,8 @@ wiki_titles.txt
 wiki_by_category.txt
 wiki_by_namespace.txt
 wiki_by_subpage.txt
+wiki_navigation_raw.txt
+wiki_navigation_structure.txt
 
 # OS 파일
 .DS_Store
