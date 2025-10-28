@@ -28,7 +28,23 @@ WIKI_PASSWORD=your_password
 python main.py
 ```
 
-실행하면 `wiki_titles.txt` 파일에 모든 문서 제목이 저장됩니다.
+실행하면 3가지 방법으로 분류된 결과 파일이 생성됩니다:
+
+### 생성되는 파일
+
+1. **`wiki_by_category.txt`** - 카테고리 기반 분류
+   - 각 문서가 속한 카테고리별로 그룹화
+   - 가장 일반적이고 체계적인 분류 방법
+   - 카테고리가 없는 문서도 별도로 표시
+
+2. **`wiki_by_namespace.txt`** - 네임스페이스 기반 분류
+   - 페이지 유형별로 분류 (Main, User, File, Template 등)
+   - MediaWiki의 기본 페이지 구조 파악에 유용
+
+3. **`wiki_by_subpage.txt`** - 하위 페이지(경로) 기반 분류
+   - URL 경로 기반 계층 구조 (`/`로 구분)
+   - 상위-하위 관계를 트리 구조로 표현
+   - 예: `프로젝트/하위프로젝트/페이지`
 
 ## 주의사항
 
