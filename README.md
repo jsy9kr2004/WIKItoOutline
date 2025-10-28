@@ -17,10 +17,29 @@ cp .env.example .env
 
 2. `.env` 파일을 열어 실제 값으로 수정:
 ```
+# MediaWiki 설정 (필수)
 WIKI_API_URL=http://your-wiki-server:port/api.php
 WIKI_USERNAME=your_username
 WIKI_PASSWORD=your_password
+
+# Outline 설정 (선택, convert_to_outline.py에서 자동 업로드 기능 사용 시)
+OUTLINE_API_URL=https://your-outline-server.com
+OUTLINE_API_TOKEN=your_api_token_here
+OUTLINE_COLLECTION_ID=your_collection_id_here
 ```
+
+### Outline API 토큰 발급 방법
+
+1. Outline 웹사이트 로그인
+2. 설정(Settings) → API 이동
+3. "Create a token" 버튼 클릭
+4. 생성된 토큰을 복사하여 `.env`의 `OUTLINE_API_TOKEN`에 입력
+
+### Outline Collection ID 확인 방법
+
+1. Outline에서 문서를 생성할 컬렉션(폴더) 열기
+2. 브라우저 URL 확인: `https://your-outline.com/collection/abc123-def456-...`
+3. `collection/` 뒤의 ID를 복사하여 `.env`의 `OUTLINE_COLLECTION_ID`에 입력
 
 ## 사용법
 
@@ -74,9 +93,14 @@ python convert_to_outline.py
 
 #### 결과
 
-- `result/` 폴더에 각 페이지별로 outline 포맷 파일이 생성됩니다
+**Outline 설정이 있는 경우:**
+- ✅ Outline에 자동으로 문서가 생성됩니다
+- 🔗 각 문서의 Outline URL이 출력됩니다
+- 💾 `result/` 폴더에도 백업용 파일이 저장됩니다
+
+**Outline 설정이 없는 경우:**
+- 💾 `result/` 폴더에만 파일로 저장됩니다
 - 파일명은 페이지 제목 기반으로 자동 생성됩니다
-- 섹션 구조와 전체 내용이 포함됩니다
 - 바로 복사해서 사용할 수 있는 포맷으로 저장됩니다
 
 #### URL 형식 지원
