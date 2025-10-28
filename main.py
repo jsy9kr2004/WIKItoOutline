@@ -86,6 +86,58 @@ def login():
         print(f"로그인 실패: {data['login']}")
         return False
 
+def get_page_content(title):
+    """특정 페이지의 내용 가져오기"""
+    params = {
+        "action": "query",
+        "titles": title,
+        "prop": "revisions",
+        "rvprop": "content",
+        "rvslots": "main",
+        "format": "json"
+    }
+
+    response = session.get(api_url, params=params)
+    data = response.json()
+
+    if 'query' not in data or 'pages' not in data['query']:
+        return None
+
+    pages = data['query']['pages']
+    page_id = list(pages.keys())[0]
+
+    if page_id == '-1':
+        return None
+
+    if 'revisions' not in pages[page_id]:
+        return None
+
+    return pages[page_id]['revisions'][0]['slots']['main']['*']
+
+
+def check_sidebar_and_navigation():
+    """사이드바 및 내비게이션 관련 페이지들 확인"""
+    print("\n위키의 내비게이션 구조를 확인하는 중...")
+
+    pages_to_check = [
+        "MediaWiki:Sidebar",
+        "MediaWiki:Navigation",
+        "목차",
+        "분류",
+        "위키 구조"
+    ]
+
+    found_pages = {}
+
+    for page_title in pages_to_check:
+        content = get_page_content(page_title)
+        if content:
+            found_pages[page_title] = content
+            print(f"  ✓ '{page_title}' 페이지 발견")
+
+    return found_pages
+
+
 def get_all_pages_with_info():
     """모든 페이지의 상세 정보 가져오기 (제목, 네임스페이스, 카테고리)"""
     pages = []
@@ -198,6 +250,42 @@ if __name__ == "__main__":
     if not login():
         print("로그인에 실패했습니다. username과 password를 확인하세요.")
         exit(1)
+
+    # 먼저 사이드바/내비게이션 구조 확인
+    found_pages = check_sidebar_and_navigation()
+
+    if found_pages:
+        print("\n발견된 내비게이션 페이지:")
+        print("="*60)
+        for page_title, content in found_pages.items():
+            print(f"\n페이지: {page_title}")
+            print(f"내용 길이: {len(content)} 문자")
+            print("-"*60)
+            # 처음 500자 미리보기
+            preview = content[:500] if len(content) > 500 else content
+            print(preview)
+            if len(content) > 500:
+                print(f"\n... (총 {len(content)}자 중 500자만 표시)")
+            print()
+
+        # 전체 내용을 파일로 저장
+        with open('wiki_navigation_raw.txt', 'w', encoding='utf-8') as f:
+            for page_title, content in found_pages.items():
+                f.write(f"{'='*60}\n")
+                f.write(f"페이지: {page_title}\n")
+                f.write(f"{'='*60}\n\n")
+                f.write(content)
+                f.write("\n\n\n")
+
+        print("✓ 'wiki_navigation_raw.txt' 파일에 원본 내용 저장 완료")
+        print("\n이 내용을 확인하시고, 어떤 형태의 구조인지 알려주시면")
+        print("그에 맞는 파싱 방법을 구현하겠습니다.")
+        exit(0)
+
+    print("\n내비게이션 페이지를 찾을 수 없습니다.")
+    print("위키 왼쪽 사이드바의 구조가 어떤 페이지에서 정의되는지 확인이 필요합니다.")
+    print("\n대안으로 기존 분류 방법을 실행하시겠습니까? (계속하려면 주석 처리)")
+    exit(0)
 
     # 모든 페이지 정보 가져오기
     pages = get_all_pages_with_info()
