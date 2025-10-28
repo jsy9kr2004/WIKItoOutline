@@ -13,10 +13,10 @@ api_url = os.getenv("WIKI_API_URL")
 username = os.getenv("WIKI_USERNAME")
 password = os.getenv("WIKI_PASSWORD")
 
-# Outline 설정 (환경 변수에서 읽기)
-outline_api_url = os.getenv("OUTLINE_API_URL")
-outline_api_token = os.getenv("OUTLINE_API_TOKEN")
-outline_collection_id = os.getenv("OUTLINE_COLLECTION_ID")
+# Outline 설정 (환경 변수에서 읽기, 공백 제거)
+outline_api_url = os.getenv("OUTLINE_API_URL", "").strip()
+outline_api_token = os.getenv("OUTLINE_API_TOKEN", "").strip()
+outline_collection_id = os.getenv("OUTLINE_COLLECTION_ID", "").strip()
 
 # 필수 환경 변수 확인 (MediaWiki)
 if not all([api_url, username, password]):
@@ -203,6 +203,36 @@ def read_urls_from_file(filename='urls.txt'):
     return urls
 
 
+def get_outline_collections():
+    """Outline의 모든 Collection 목록 가져오기"""
+    if not use_outline:
+        return None
+
+    # API URL 확인 (끝에 /api가 없으면 추가)
+    api_base = outline_api_url.rstrip('/')
+    if not api_base.endswith('/api'):
+        api_base += '/api'
+
+    endpoint = f"{api_base}/collections.list"
+
+    headers = {
+        "Authorization": f"Bearer {outline_api_token}",
+        "Content-Type": "application/json"
+    }
+
+    try:
+        response = requests.post(endpoint, headers=headers, json={}, timeout=30)
+
+        if response.status_code == 200:
+            data = response.json()
+            if 'data' in data:
+                return data['data']
+        return None
+
+    except:
+        return None
+
+
 def create_outline_document(title, content):
     """Outline API를 통해 문서 생성"""
     if not use_outline:
@@ -242,6 +272,10 @@ def create_outline_document(title, content):
                 error_data = response.json()
                 if 'message' in error_data:
                     error_msg = error_data['message']
+                # 디버그: 전체 에러 응답 출력
+                print(f"  [DEBUG] 전체 에러 응답: {error_data}")
+                print(f"  [DEBUG] 사용한 Collection ID: '{outline_collection_id}'")
+                print(f"  [DEBUG] Collection ID 길이: {len(outline_collection_id)}")
             except:
                 pass
             return False, error_msg
@@ -262,6 +296,30 @@ def main():
     if not login():
         print("로그인에 실패했습니다.")
         return
+
+    # Outline Collection 목록 확인 (디버깅용)
+    if use_outline:
+        print("\n[Outline 설정 확인]")
+        collections = get_outline_collections()
+        if collections:
+            print(f"✓ 사용 가능한 Collection 목록 ({len(collections)}개):")
+            for coll in collections:
+                coll_id = coll.get('id', 'N/A')
+                coll_name = coll.get('name', 'N/A')
+                print(f"  - {coll_name}: {coll_id}")
+            print(f"\n현재 설정된 Collection ID: {outline_collection_id}")
+
+            # 설정된 ID가 목록에 있는지 확인
+            valid_ids = [c.get('id') for c in collections]
+            if outline_collection_id in valid_ids:
+                print("✓ Collection ID가 올바릅니다.")
+            else:
+                print("✗ 경고: 설정된 Collection ID가 목록에 없습니다!")
+                print("  위 목록에서 올바른 ID를 복사하여 .env 파일에 설정하세요.")
+        else:
+            print("✗ Collection 목록을 가져올 수 없습니다.")
+            print("  API URL과 Token을 확인하세요.")
+        print()
 
     # URL 목록 읽기
     urls = read_urls_from_file('urls.txt')
