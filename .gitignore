@@ -21,6 +21,9 @@ ENV/
 
 # 생성된 출력 파일
 wiki_titles.txt
+wiki_by_category.txt
+wiki_by_namespace.txt
+wiki_by_subpage.txt
 
 # OS 파일
 .DS_Store
