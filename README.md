@@ -24,6 +24,8 @@ WIKI_PASSWORD=your_password
 
 ## 사용법
 
+### 1. 위키 문서 구조 분석 (main.py)
+
 ```bash
 python main.py
 ```
@@ -45,6 +47,44 @@ python main.py
    - URL 경로 기반 계층 구조 (`/`로 구분)
    - 상위-하위 관계를 트리 구조로 표현
    - 예: `프로젝트/하위프로젝트/페이지`
+
+### 2. 위키 페이지 → Outline 변환 (convert_to_outline.py)
+
+특정 위키 페이지들을 Outline 포맷으로 변환합니다.
+
+#### 설정
+
+1. `urls.txt.example` 파일을 복사하여 `urls.txt` 파일 생성:
+```bash
+cp urls.txt.example urls.txt
+```
+
+2. `urls.txt` 파일에 변환할 위키 페이지 URL을 한 줄에 하나씩 입력:
+```
+http://192.168.1.153:8080/index.php/Main_Page
+http://192.168.1.153:8080/index.php/프로젝트/개요
+http://192.168.1.153:8080/index.php/문서/가이드
+```
+
+#### 실행
+
+```bash
+python convert_to_outline.py
+```
+
+#### 결과
+
+- `result/` 폴더에 각 페이지별로 outline 포맷 파일이 생성됩니다
+- 파일명은 페이지 제목 기반으로 자동 생성됩니다
+- 섹션 구조와 전체 내용이 포함됩니다
+- 바로 복사해서 사용할 수 있는 포맷으로 저장됩니다
+
+#### URL 형식 지원
+
+다음 형식의 URL을 지원합니다:
+- `http://wiki.example.com/index.php/PageTitle`
+- `http://wiki.example.com/wiki/PageTitle`
+- `http://wiki.example.com/index.php?title=PageTitle`
 
 ## 주의사항
 
