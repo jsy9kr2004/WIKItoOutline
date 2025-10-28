@@ -1,9 +1,25 @@
+import os
 import requests
+from dotenv import load_dotenv
 
-# MediaWiki 설정
-api_url = "http://192.168.1.153:8080/api.php"
-username = "your_username"  # 여기에 위키 사용자명 입력
-password = "your_password"  # 여기에 위키 비밀번호 입력
+# .env 파일에서 환경 변수 로드
+load_dotenv()
+
+# MediaWiki 설정 (환경 변수에서 읽기)
+api_url = os.getenv("WIKI_API_URL")
+username = os.getenv("WIKI_USERNAME")
+password = os.getenv("WIKI_PASSWORD")
+
+# 필수 환경 변수 확인
+if not all([api_url, username, password]):
+    raise ValueError(
+        "환경 변수가 설정되지 않았습니다.\n"
+        ".env 파일을 생성하고 다음 변수들을 설정하세요:\n"
+        "- WIKI_API_URL\n"
+        "- WIKI_USERNAME\n"
+        "- WIKI_PASSWORD\n"
+        "\n.env.example 파일을 참고하세요."
+    )
 
 # 세션 생성
 session = requests.Session()
